@@ -293,6 +293,7 @@ forEachCli(() => {
               type: 'static'
             }
           ],
+          mylib2: [],
           myapp: [
             {
               source: 'myapp',
@@ -307,7 +308,8 @@ forEachCli(() => {
               target: 'myapp',
               type: 'implicit'
             }
-          ]
+          ],
+          myapp3: []
         });
 
         runCommand(

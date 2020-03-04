@@ -180,7 +180,9 @@ describe('project graph', () => {
             source: 'demo',
             target: 'api'
           }
-        ]
+        ],
+        api: [],
+        ui: []
       }
     });
   });
@@ -232,6 +234,7 @@ describe('project graph', () => {
         }
       },
       dependencies: {
+        'happy-nrwl': [],
         'demo-e2e': [
           {
             type: 'implicit',
