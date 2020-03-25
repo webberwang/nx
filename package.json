@@ -21,7 +21,7 @@
     "copy": "./scripts/copy.sh",
     "test": "yarn linknpm fast && ./scripts/test.sh",
     "test:all": "yarn linknpm fast && ./scripts/test_angular_runtime.sh && ./scripts/test.sh",
-    "checkformat": "./scripts/check_format.sh",
+    "checkformat": "./scripts/check-format.sh",
     "checkimports": "node ./scripts/check-imports.js",
     "checkversions": "ts-node ./scripts/check-versions.ts",
     "local-registry": "./scripts/local-registry.sh",

@@ -45,6 +45,7 @@
     "dotenv": "6.2.0",
     "ts-node": "~7.0.0",
     "tslint": "~5.11.0",
+    "@babel/compat-data": "7.8.0",
     "eslint": "<%= eslintVersion %>",
     "typescript": "<%= typescriptVersion %>",
     "prettier": "<%= prettierVersion %>"
