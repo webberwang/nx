@@ -32,7 +32,7 @@ export function updateProject(options: NormalizedSchema): Rule {
       host.delete(path.join(libRoot, `${options.name}.component.ts`));
       host.delete(path.join(libRoot, `${options.name}.component.spec.ts`));
 
-      if (!options.publishable) {
+      if (!options.publishable && !options.buildable) {
         host.delete(path.join(options.projectRoot, 'ng-package.json'));
         host.delete(path.join(options.projectRoot, 'package.json'));
         host.delete(path.join(options.projectRoot, 'tsconfig.lib.prod.json'));
@@ -123,7 +123,7 @@ export function updateProject(options: NormalizedSchema): Rule {
           };
         }
 
-        if (!options.publishable) {
+        if (!options.publishable && !options.buildable) {
           delete fixedProject.architect.build;
         } else {
           // adjust the builder path to our custom one
