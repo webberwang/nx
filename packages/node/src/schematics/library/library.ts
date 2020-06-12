@@ -10,19 +10,20 @@ import {
   noop,
   Rule,
   SchematicContext,
+  SchematicsException,
   template,
   Tree,
   url,
 } from '@angular-devkit/schematics';
 import {
   formatFiles,
+  getNpmScope,
   getProjectConfig,
   names,
   offsetFromRoot,
   toFileName,
   updateJsonInTree,
   updateWorkspaceInTree,
-  getNpmScope,
 } from '@nrwl/workspace';
 import { Schema } from './schema';
 import { libsDir } from '@nrwl/workspace/src/utils/ast-utils';
@@ -40,8 +41,17 @@ export default function (schema: NormalizedSchema): Rule {
   return (host: Tree, context: SchematicContext) => {
     const options = normalizeOptions(host, schema);
 
+    if (options.publishable === true && !schema.importPath) {
+      throw new SchematicsException(
+        `For publishable libs you have to provide a proper "--importPath" which needs to be a valid npm package name (e.g. my-awesome-lib or @myorg/my-lib)`
+      );
+    }
+
     return chain([
-      externalSchematic('@nrwl/workspace', 'lib', schema),
+      externalSchematic('@nrwl/workspace', 'lib', {
+        ...schema,
+        importPath: options.importPath,
+      }),
       createFiles(options),
       updateTsConfig(options),
       addProject(options),
@@ -65,7 +75,10 @@ function normalizeOptions(host: Tree, options: Schema): NormalizedSchema {
     ? options.tags.split(',').map((s) => s.trim())
     : [];
 
-  const normalized: NormalizedSchema = {
+  const importPath =
+    options.importPath || `@${defaultPrefix}/${projectDirectory}`;
+
+  return {
     ...options,
     prefix: defaultPrefix, // we could also allow customizing this
     fileName,
@@ -73,9 +86,8 @@ function normalizeOptions(host: Tree, options: Schema): NormalizedSchema {
     projectRoot,
     projectDirectory,
     parsedTags,
+    importPath,
   };
-
-  return normalized;
 }
 
 function createFiles(options: NormalizedSchema): Rule {
@@ -91,7 +103,7 @@ function createFiles(options: NormalizedSchema): Rule {
       options.unitTestRunner === 'none'
         ? filter((file) => !file.endsWith('spec.ts'))
         : noop(),
-      options.publishable
+      options.publishable || options.buildable
         ? noop()
         : filter((file) => !file.endsWith('package.json')),
     ]),
@@ -114,7 +126,7 @@ function updateTsConfig(options: NormalizedSchema): Rule {
 }
 
 function addProject(options: NormalizedSchema): Rule {
-  if (!options.publishable) {
+  if (!options.publishable && !options.buildable) {
     return noop();
   }
 
