@@ -10,7 +10,11 @@ describe('NxPlugin plugin', () => {
   });
 
   it('should update the workspace.json file', async () => {
-    const tree = await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    const tree = await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     const workspace = await readWorkspace(tree);
     const project = workspace.projects['my-plugin'];
     expect(project.root).toEqual('libs/my-plugin');
@@ -62,7 +66,11 @@ describe('NxPlugin plugin', () => {
   });
 
   it('should update the tsconfig.lib.json file', async () => {
-    const tree = await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    const tree = await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     const tsLibConfig = readJsonInTree(
       tree,
       'libs/my-plugin/tsconfig.lib.json'
@@ -71,7 +79,11 @@ describe('NxPlugin plugin', () => {
   });
 
   it('should create schematic and builder files', async () => {
-    const tree = await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    const tree = await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     expect(tree.exists('libs/my-plugin/collection.json')).toBeTruthy();
     expect(tree.exists('libs/my-plugin/builders.json')).toBeTruthy();
     expect(
@@ -115,7 +127,11 @@ describe('NxPlugin plugin', () => {
 
   it('should call the @nrwl/node:lib schematic', async () => {
     const externalSchematicSpy = jest.spyOn(ngSchematics, 'externalSchematic');
-    await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     expect(externalSchematicSpy).toBeCalledWith(
       '@nrwl/node',
       'lib',
@@ -127,7 +143,11 @@ describe('NxPlugin plugin', () => {
 
   it('should call the @nrwl/nx-plugin:e2e schematic', async () => {
     const schematicSpy = jest.spyOn(ngSchematics, 'schematic');
-    const tree = await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    const tree = await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     expect(schematicSpy).toBeCalledWith(
       'e2e-project',
       expect.objectContaining({
@@ -140,7 +160,11 @@ describe('NxPlugin plugin', () => {
 
   it('should call the @nrwl/nx-plugin:schematic schematic', async () => {
     const schematicSpy = jest.spyOn(ngSchematics, 'schematic');
-    const tree = await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    const tree = await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     expect(schematicSpy).toBeCalledWith(
       'schematic',
       expect.objectContaining({
@@ -152,7 +176,11 @@ describe('NxPlugin plugin', () => {
 
   it('should call the @nrwl/nx-plugin:builder schematic', async () => {
     const schematicSpy = jest.spyOn(ngSchematics, 'schematic');
-    const tree = await runSchematic('plugin', { name: 'myPlugin' }, appTree);
+    const tree = await runSchematic(
+      'plugin',
+      { name: 'myPlugin', importPath: '@proj/my-plugin' },
+      appTree
+    );
     expect(schematicSpy).toBeCalledWith(
       'builder',
       expect.objectContaining({
@@ -171,7 +199,11 @@ describe('NxPlugin plugin', () => {
         );
         const tree = await runSchematic(
           'plugin',
-          { name: 'myPlugin', unitTestRunner: 'none' },
+          {
+            name: 'myPlugin',
+            importPath: '@proj/my-plugin',
+            unitTestRunner: 'none',
+          },
           appTree
         );
 

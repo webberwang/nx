@@ -50,6 +50,7 @@ export default function (schema: NormalizedSchema): Rule {
       externalSchematic('@nrwl/node', 'lib', {
         ...schema,
         publishable: true,
+        importPath: schema.importPath,
         unitTestRunner: options.unitTestRunner,
       }),
       addFiles(options),
