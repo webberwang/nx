@@ -45,10 +45,15 @@ export function createAllStories(
   js
 ): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    const projectSrcRoot = getProjectConfig(tree, projectName).sourceRoot;
-    const libPath = join(projectSrcRoot, '/lib');
-
-    let componentPaths: string[] = [];
+    const { sourceRoot: projectSrcRoot, projectType } = getProjectConfig(
+      tree,
+      projectName
+    );
+    const libPath = join(
+      projectSrcRoot,
+      projectType === 'application' ? 'app' : 'lib'
+    );
+    const componentPaths: string[] = [];
     tree.getDir(libPath).visit((filePath) => {
       if (
         (filePath.endsWith('.tsx') && !filePath.endsWith('.spec.tsx')) ||

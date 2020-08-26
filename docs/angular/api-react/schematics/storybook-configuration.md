@@ -34,7 +34,7 @@ Run the cypress-configure schematic.
 
 Type: `boolean`
 
-Automatically generate \*.stories.ts files for components declared in this library.
+Automatically generate \*.stories.ts files for components declared in this library or application.
 
 ### js
 
@@ -58,4 +58,4 @@ The tool to use for running lint checks.
 
 Type: `string`
 
-Library name
+Library or application name

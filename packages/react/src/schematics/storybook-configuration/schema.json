@@ -5,7 +5,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "Library name",
+      "description": "Library or application name",
       "$default": {
         "$source": "argv",
         "index": 0
@@ -18,8 +18,8 @@
     },
     "generateStories": {
       "type": "boolean",
-      "description": "Automatically generate *.stories.ts files for components declared in this library.",
-      "x-prompt": "Automatically generate story files for components declared in this library?"
+      "description": "Automatically generate *.stories.ts files for components declared in this library or application.",
+      "x-prompt": "Automatically generate story files for components declared in this library or application?"
     },
     "js": {
       "type": "boolean",
