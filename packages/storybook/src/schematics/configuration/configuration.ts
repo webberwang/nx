@@ -18,7 +18,6 @@ import {
   Linter,
 } from '@nrwl/workspace';
 import { join, normalize } from '@angular-devkit/core';
-
 import {
   applyWithSkipExisting,
   isFramework,
@@ -30,24 +29,28 @@ import { toJS } from '@nrwl/workspace/src/utils/rules/to-js';
 
 export default function (rawSchema: StorybookConfigureSchema): Rule {
   const schema = normalizeSchema(rawSchema);
-  return chain([
-    schematic('ng-add', {
-      uiFramework: schema.uiFramework,
-    }),
-    createRootStorybookDir(schema.name, schema.js),
-    createLibStorybookDir(schema.name, schema.uiFramework, schema.js),
-    configureTsLibConfig(schema),
-    configureTsSolutionConfig(schema),
-    updateLintTask(schema),
-    addStorybookTask(schema.name, schema.uiFramework),
-    schema.configureCypress
-      ? schematic<CypressConfigureSchema>('cypress-project', {
+  return (tree: Tree, context: SchematicContext) => {
+    const { projectType } = getProjectConfig(tree, schema.name);
+    return chain([
+      schematic('ng-add', {
+        uiFramework: schema.uiFramework,
+      }),
+      createRootStorybookDir(schema.name, schema.uiFramework, schema.js),
+      createProjectStorybookDir(schema.name, schema.uiFramework, schema.js),
+      configureTsProjectConfig(schema),
+      configureTsSolutionConfig(schema),
+      updateLintTask(schema),
+      addStorybookTask(schema.name, schema.uiFramework),
+      schema.configureCypress && projectType !== 'application'
+        ? schematic<CypressConfigureSchema>('cypress-project', {
           name: schema.name,
           js: schema.js,
           linter: schema.linter,
-        })
-      : () => {},
-  ]);
+        }) : () => {
+          context.logger.warn("There is already an e2e project setup");
+        },
+    ]);
+  }
 }
 
 function normalizeSchema(schema: StorybookConfigureSchema) {
@@ -61,30 +64,36 @@ function normalizeSchema(schema: StorybookConfigureSchema) {
   };
 }
 
-function createRootStorybookDir(projectName: string, js: boolean): Rule {
+function createRootStorybookDir(projectName: string, uiFramework: StorybookConfigureSchema['uiFramework'], js: boolean): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    context.logger.debug('adding .storybook folder to lib');
-
+    const { projectType } = getProjectConfig(tree, projectName);
+    context.logger.debug(`adding .storybook folder to' ${projectType === 'application' ? 'app' : 'lib'}`);
     return chain([
-      applyWithSkipExisting(url('./root-files'), [js ? toJS() : noop()]),
+      applyWithSkipExisting(url('./root-files'), [js ? toJS() : noop(), template({
+        tmpl: '',
+        uiFramework,
+        projectType: projectType === 'application' ? 'app' : 'lib'
+      })]),
     ])(tree, context);
   };
 }
 
-function createLibStorybookDir(
+function createProjectStorybookDir(
   projectName: string,
   uiFramework: StorybookConfigureSchema['uiFramework'],
   js: boolean
 ): Rule {
   return (tree: Tree, context: SchematicContext) => {
-    context.logger.debug('adding .storybook folder to lib');
+    const { projectType } = getProjectConfig(tree, projectName);
+    context.logger.debug(`adding .storybook folder to ${projectType === 'application' ? 'app' : 'lib'}`);
     const projectConfig = getProjectConfig(tree, projectName);
     return chain([
-      applyWithSkipExisting(url('./lib-files'), [
+      applyWithSkipExisting(url('./project-files'), [
         template({
           tmpl: '',
           uiFramework,
           offsetFromRoot: offsetFromRoot(projectConfig.root),
+          projectType: projectType === 'application' ? 'app' : 'lib'
         }),
         move(projectConfig.root),
         js ? toJS() : noop(),
@@ -102,7 +111,7 @@ function getTsConfigPath(tree: Tree, projectName: string): string {
   );
 }
 
-function configureTsLibConfig(schema: StorybookConfigureSchema): Rule {
+function configureTsProjectConfig(schema: StorybookConfigureSchema): Rule {
   const { name: projectName } = schema;
 
   return (tree: Tree) => {
