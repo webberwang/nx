@@ -43,14 +43,15 @@ export default function (rawSchema: StorybookConfigureSchema): Rule {
       addStorybookTask(schema.name, schema.uiFramework),
       schema.configureCypress && projectType !== 'application'
         ? schematic<CypressConfigureSchema>('cypress-project', {
-          name: schema.name,
-          js: schema.js,
-          linter: schema.linter,
-        }) : () => {
-          context.logger.warn("There is already an e2e project setup");
-        },
+            name: schema.name,
+            js: schema.js,
+            linter: schema.linter,
+          })
+        : () => {
+            context.logger.warn('There is already an e2e project setup');
+          },
     ]);
-  }
+  };
 }
 
 function normalizeSchema(schema: StorybookConfigureSchema) {
@@ -64,16 +65,27 @@ function normalizeSchema(schema: StorybookConfigureSchema) {
   };
 }
 
-function createRootStorybookDir(projectName: string, uiFramework: StorybookConfigureSchema['uiFramework'], js: boolean): Rule {
+function createRootStorybookDir(
+  projectName: string,
+  uiFramework: StorybookConfigureSchema['uiFramework'],
+  js: boolean
+): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const { projectType } = getProjectConfig(tree, projectName);
-    context.logger.debug(`adding .storybook folder to' ${projectType === 'application' ? 'app' : 'lib'}`);
+    context.logger.debug(
+      `adding .storybook folder to' ${
+        projectType === 'application' ? 'app' : 'lib'
+      }`
+    );
     return chain([
-      applyWithSkipExisting(url('./root-files'), [js ? toJS() : noop(), template({
-        tmpl: '',
-        uiFramework,
-        projectType: projectType === 'application' ? 'app' : 'lib'
-      })]),
+      applyWithSkipExisting(url('./root-files'), [
+        js ? toJS() : noop(),
+        template({
+          tmpl: '',
+          uiFramework,
+          projectType: projectType === 'application' ? 'app' : 'lib',
+        }),
+      ]),
     ])(tree, context);
   };
 }
@@ -85,7 +97,11 @@ function createProjectStorybookDir(
 ): Rule {
   return (tree: Tree, context: SchematicContext) => {
     const { projectType } = getProjectConfig(tree, projectName);
-    context.logger.debug(`adding .storybook folder to ${projectType === 'application' ? 'app' : 'lib'}`);
+    context.logger.debug(
+      `adding .storybook folder to ${
+        projectType === 'application' ? 'app' : 'lib'
+      }`
+    );
     const projectConfig = getProjectConfig(tree, projectName);
     return chain([
       applyWithSkipExisting(url('./project-files'), [
@@ -93,7 +109,7 @@ function createProjectStorybookDir(
           tmpl: '',
           uiFramework,
           offsetFromRoot: offsetFromRoot(projectConfig.root),
-          projectType: projectType === 'application' ? 'app' : 'lib'
+          projectType: projectType === 'application' ? 'app' : 'lib',
         }),
         move(projectConfig.root),
         js ? toJS() : noop(),

@@ -19,6 +19,7 @@ describe('react:storybook-configuration', () => {
         <StorybookConfigureSchema>{
           name: 'test-ui-lib',
           configureCypress: true,
+          generateCypressSpecs: true,
         },
         appTree
       );
@@ -103,7 +104,15 @@ describe('react:storybook-configuration', () => {
       expect(
         tree.exists('apps/test-ui-app/.storybook/tsconfig.json')
       ).toBeTruthy();
-      expect(tree.exists('apps/test-ui-app-e2e/cypress.json')).toBeTruthy();
+
+      /**
+       * Note on the removal of
+       * expect(tree.exists('apps/test-ui-app-e2e/cypress.json')).toBeTruthy();
+       *
+       * When calling createTestAppLib() we do not generate an e2e suite.
+       * The storybook schematic for apps does not generate e2e test.
+       * So, there exists no test-ui-app-e2e!
+       */
     });
 
     it('should generate stories for components', async () => {
@@ -118,7 +127,9 @@ describe('react:storybook-configuration', () => {
         appTree
       );
 
-      // Currently the auto-generate stories feature only picks up components under the 'lib' directory. In our 'createTestAppLib' function, we call @nrwl/react:component to generate a component under the specified 'lib' directory
+      // Currently the auto-generate stories feature only picks up components under the 'lib' directory.
+      // In our 'createTestAppLib' function, we call @nrwl/react:component to generate a component
+      // under the specified 'lib' directory
       expect(
         tree.exists(
           'apps/test-ui-app/src/app/my-component/my-component.stories.tsx'
