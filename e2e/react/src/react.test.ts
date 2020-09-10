@@ -156,28 +156,18 @@ forEachCli('nx', () => {
         JSON.stringify(
           {
             presets: ['@nrwl/react/babel'],
+            plugins: [
+              [
+                'styled-components',
+                { pure: true, ssr: true, displayName: true },
+              ],
+            ],
             env: {
-              development: {
-                plugins: [
-                  [
-                    'styled-components',
-                    {
-                      pure: true,
-                      ssr: true,
-                      displayName: true,
-                    },
-                  ],
-                ],
-              },
               production: {
                 plugins: [
                   [
                     'styled-components',
-                    {
-                      pure: true,
-                      ssr: true,
-                      displayName: false,
-                    },
+                    { pure: true, ssr: true, displayName: false },
                   ],
                 ],
               },
@@ -233,6 +223,36 @@ forEachCli('nx', () => {
       ).toThrow(/does not exist/);
       expect(readFile(`dist/apps/${noStylesApp}/index.html`)).not.toContain(
         `<link rel="stylesheet" href="styles.css">`
+      );
+    }, 120000);
+
+    it('should generate app with legacy-ie support', async () => {
+      ensureProject();
+      const appName = uniq('app');
+
+      runCLI(
+        `generate @nrwl/react:app ${appName} --style=css --no-interactive`
+      );
+
+      // changing browser suporrt of this application
+      updateFile(`apps/${appName}/.browserslistrc`, `IE 11`);
+
+      await testGeneratedApp(appName, {
+        checkStyles: false,
+        checkProdBuild: true,
+        checkLinter: false,
+        checkE2E: false,
+      });
+
+      const filesToCheck = [
+        `dist/apps/${appName}/prod/polyfills.es5.js`,
+        `dist/apps/${appName}/prod/main.es5.js`,
+      ];
+
+      checkFilesExist(...filesToCheck);
+
+      expect(readFile(`dist/apps/${appName}/prod/index.html`)).toContain(
+        `<script src="main.esm.js" type="module"></script><script src="main.es5.js" nomodule defer></script>`
       );
     }, 120000);
 
