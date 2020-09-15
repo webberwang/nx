@@ -10,7 +10,7 @@ describe('react:stories for applications', () => {
   let tree: UnitTestTree;
 
   beforeEach(async () => {
-    appTree = await createTestUILib('test-ui-app');
+    appTree = await createTestUIApp('test-ui-app');
 
     // create another component
     appTree.create(
@@ -99,7 +99,7 @@ describe('react:stories for applications', () => {
   });
 });
 
-export async function createTestUILib(
+export async function createTestUIApp(
   libName: string,
   plainJS = false
 ): Promise<Tree> {

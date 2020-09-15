@@ -1,7 +1,6 @@
 import { UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Tree } from '@angular-devkit/schematics';
 import { readJsonInTree } from '@nrwl/workspace';
-
 import { findModuleParent } from '@nrwl/workspace';
 import { getFileContent } from '@nrwl/workspace/testing';
 import {

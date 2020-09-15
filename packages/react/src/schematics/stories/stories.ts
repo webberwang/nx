@@ -9,6 +9,7 @@ import {
 } from '@angular-devkit/schematics';
 import { join, Path } from '@angular-devkit/core';
 import { getProjectConfig } from '@nrwl/workspace';
+import { projectRootPath } from '@nrwl/workspace/src/utils/project-type';
 import { CreateComponentStoriesFileSchema } from '../component-story/component-story';
 import { CreateComponentSpecFileSchema } from '../component-cypress-spec/component-cypress-spec';
 import { getComponentName } from '../../utils/ast-utils';
@@ -49,10 +50,7 @@ export function createAllStories(
       tree,
       projectName
     );
-    const libPath = join(
-      projectSrcRoot,
-      projectType === 'application' ? 'app' : 'lib'
-    );
+    const libPath = projectRootPath(tree, projectName);
     const componentPaths: string[] = [];
     tree.getDir(libPath).visit((filePath) => {
       if (
